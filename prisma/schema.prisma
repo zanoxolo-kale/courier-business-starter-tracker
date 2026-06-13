@@ -1,25 +1,233 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+generator client {
+  provider = "prisma-client-js"
+}
 
-enum PlatformName { ALL MR_D BOLT UBER_EATS UBER_PASSENGERS }
-enum Priority { LOW MEDIUM HIGH }
-enum TaskStatus { NOT_STARTED IN_PROGRESS COMPLETED BLOCKED }
-enum DocumentStatus { MISSING IN_PROGRESS READY UPLOADED REJECTED EXPIRED }
-enum PaymentStatus { NOT_PAID PARTLY_PAID PAID }
-enum OwnershipType { OWNED FINANCED RENTED PLANNING_TO_BUY }
-enum ApplicationType { FOOD_DELIVERY GROCERY_DELIVERY PACKAGE_DELIVERY PASSENGER_TRANSPORT }
-enum ApplicationStatus { NOT_STARTED DOCUMENTS_GATHERING SUBMITTED UNDER_REVIEW APPROVED REJECTED BLOCKED }
-enum ShiftType { MORNING LUNCH AFTERNOON DINNER EVENING WEEKEND }
-enum ExpenseCategory { FUEL DATA AIRTIME VEHICLE_MAINTENANCE INSURANCE PARKING CLEANING FOOD_DELIVERY_SUPPLIES OTHER }
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-model User { id String @id @default(cuid()) name String email String @unique createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model Platform { id String @id @default(cuid()) name PlatformName @unique displayName String applicationTypes String[] requirements PlatformRequirement[] createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model PlatformRequirement { id String @id @default(cuid()) platformId String platform Platform @relation(fields:[platformId], references:[id], onDelete:Cascade) category String title String value String editable Boolean @default(true) notes String? createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model StartupChecklistItem { id String @id @default(cuid()) title String description String phase String platform PlatformName @default(ALL) priority Priority @default(MEDIUM) status TaskStatus @default(NOT_STARTED) dueDate DateTime? notes String? documentRequired Boolean @default(false) estimatedCost Decimal @default(0) actualCost Decimal @default(0) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model StartupCost { id String @id @default(cuid()) itemName String category String platform PlatformName @default(ALL) estimatedCost Decimal @default(0) actualCost Decimal @default(0) paymentStatus PaymentStatus @default(NOT_PAID) dueDate DateTime? notes String? createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model VehiclePlan { id String @id @default(cuid()) vehicleType String ownershipType OwnershipType vehicleYear Int? platformUse PlatformName monthlyRepaymentOrRentalCost Decimal @default(0) estimatedMonthlyFuelCost Decimal @default(0) insuranceCost Decimal @default(0) maintenanceEstimate Decimal @default(0) licenceStatus String roadworthyStatus String inspectionStatus String operatingCardStatus String notes String? createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model RequiredDocument { id String @id @default(cuid()) documentName String category String platform PlatformName @default(ALL) requiredFor String status DocumentStatus @default(MISSING) expiryDate DateTime? uploadDate DateTime? notes String? createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model PlatformApplication { id String @id @default(cuid()) platform PlatformName applicationType ApplicationType applicationStatus ApplicationStatus @default(NOT_STARTED) dateStarted DateTime? dateSubmitted DateTime? expectedResponseDate DateTime? blockerReason String? notes String? createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model WeeklyIncome { id String @id @default(cuid()) platform PlatformName date DateTime shiftType ShiftType grossIncome Decimal tips Decimal @default(0) tripsOrDeliveries Int notes String? createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model WeeklyExpense { id String @id @default(cuid()) date DateTime category ExpenseCategory amount Decimal platform PlatformName @default(ALL) notes String? createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model LearningGuideArticle { id String @id @default(cuid()) title String slug String @unique topic String content String order Int @default(0) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
+enum PlatformName {
+  ALL
+  MR_D
+  BOLT
+  UBER_EATS
+  UBER_PASSENGERS
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  BLOCKED
+}
+
+enum DocumentStatus {
+  MISSING
+  IN_PROGRESS
+  READY
+  UPLOADED
+  REJECTED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  NOT_PAID
+  PARTLY_PAID
+  PAID
+}
+
+enum OwnershipType {
+  OWNED
+  FINANCED
+  RENTED
+  PLANNING_TO_BUY
+}
+
+enum ApplicationType {
+  FOOD_DELIVERY
+  GROCERY_DELIVERY
+  PACKAGE_DELIVERY
+  PASSENGER_TRANSPORT
+}
+
+enum ApplicationStatus {
+  NOT_STARTED
+  DOCUMENTS_GATHERING
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  BLOCKED
+}
+
+enum ShiftType {
+  MORNING
+  LUNCH
+  AFTERNOON
+  DINNER
+  EVENING
+  WEEKEND
+}
+
+enum ExpenseCategory {
+  FUEL
+  DATA
+  AIRTIME
+  VEHICLE_MAINTENANCE
+  INSURANCE
+  PARKING
+  CLEANING
+  FOOD_DELIVERY_SUPPLIES
+  OTHER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Platform {
+  id               String                @id @default(cuid())
+  name             PlatformName          @unique
+  displayName      String
+  applicationTypes String[]
+  requirements     PlatformRequirement[]
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+}
+
+model PlatformRequirement {
+  id         String   @id @default(cuid())
+  platformId String
+  platform   Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  category   String
+  title      String
+  value      String
+  editable   Boolean  @default(true)
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model StartupChecklistItem {
+  id               String       @id @default(cuid())
+  title            String
+  description      String
+  phase            String
+  platform         PlatformName @default(ALL)
+  priority         Priority     @default(MEDIUM)
+  status           TaskStatus   @default(NOT_STARTED)
+  dueDate          DateTime?
+  notes            String?
+  documentRequired Boolean      @default(false)
+  estimatedCost    Decimal      @default(0)
+  actualCost       Decimal      @default(0)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+}
+
+model StartupCost {
+  id            String        @id @default(cuid())
+  itemName      String
+  category      String
+  platform      PlatformName  @default(ALL)
+  estimatedCost Decimal       @default(0)
+  actualCost    Decimal       @default(0)
+  paymentStatus PaymentStatus @default(NOT_PAID)
+  dueDate       DateTime?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model VehiclePlan {
+  id                           String        @id @default(cuid())
+  vehicleType                  String
+  ownershipType                OwnershipType
+  vehicleYear                  Int?
+  platformUse                  PlatformName
+  monthlyRepaymentOrRentalCost Decimal       @default(0)
+  estimatedMonthlyFuelCost     Decimal       @default(0)
+  insuranceCost                Decimal       @default(0)
+  maintenanceEstimate          Decimal       @default(0)
+  licenceStatus                String
+  roadworthyStatus             String
+  inspectionStatus             String
+  operatingCardStatus          String
+  notes                        String?
+  createdAt                    DateTime      @default(now())
+  updatedAt                    DateTime      @updatedAt
+}
+
+model RequiredDocument {
+  id           String         @id @default(cuid())
+  documentName String
+  category     String
+  platform     PlatformName   @default(ALL)
+  requiredFor  String
+  status       DocumentStatus @default(MISSING)
+  expiryDate   DateTime?
+  uploadDate   DateTime?
+  notes        String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model PlatformApplication {
+  id                   String            @id @default(cuid())
+  platform             PlatformName
+  applicationType      ApplicationType
+  applicationStatus    ApplicationStatus @default(NOT_STARTED)
+  dateStarted          DateTime?
+  dateSubmitted        DateTime?
+  expectedResponseDate DateTime?
+  blockerReason        String?
+  notes                String?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+}
+
+model WeeklyIncome {
+  id                String       @id @default(cuid())
+  platform          PlatformName
+  date              DateTime
+  shiftType         ShiftType
+  grossIncome       Decimal
+  tips              Decimal      @default(0)
+  tripsOrDeliveries Int
+  notes             String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+model WeeklyExpense {
+  id        String          @id @default(cuid())
+  date      DateTime
+  category  ExpenseCategory
+  amount    Decimal
+  platform  PlatformName    @default(ALL)
+  notes     String?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model LearningGuideArticle {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  topic     String
+  content   String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
