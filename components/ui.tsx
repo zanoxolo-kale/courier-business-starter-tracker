@@ -1,0 +1,4 @@
+export function Card({title,value,children}:{title:string;value?:string|number;children?:React.ReactNode}){return <div className="card"><p className="text-sm text-slate-500">{title}</p>{value!==undefined&&<p className="mt-2 text-3xl font-bold">{value}</p>}{children}</div>}
+export function Progress({label,value}:{label:string;value:number}){return <div><div className="mb-1 flex justify-between text-sm"><span>{label}</span><b>{value}%</b></div><div className="h-3 rounded-full bg-slate-200"><div className="h-3 rounded-full bg-brand-500" style={{width:`${value}%`}}/></div></div>}
+export function StatusBadge({children}:{children:React.ReactNode}){return <span className="badge bg-slate-100 text-slate-700">{children}</span>}
+export function Empty({text}:{text:string}){return <div className="rounded-xl border border-dashed p-8 text-center text-slate-500">{text}</div>}
